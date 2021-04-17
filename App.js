@@ -4,8 +4,7 @@ import { StyleSheet, Text, View, Pressable, Button, Modal } from "react-native";
 import { MaterialCommunityIcons as Icon } from "react-native-vector-icons";
 
 export default function App() {
-  // const [getturn, setturn] = useState('');
-
+  const [getturn, setturn] = useState({ turn1: "*", turn2: "" });
   const [getmodal, setmodal] = useState("false");
   const [gettext, settext] = useState("");
 
@@ -27,6 +26,9 @@ export default function App() {
       ],
       playerTurn: 1,
     });
+    setturn({ turn1: "*", turn2: "" });
+    setmodal(false);
+    settext("");
   };
 
   const renderIcon = (row, col) => {
@@ -90,7 +92,6 @@ export default function App() {
   };
 
   const playAgain = () => {
-    setmodal(false);
     initializaGame();
   };
 
@@ -107,24 +108,64 @@ export default function App() {
     setstate({ gameState: arr, playerTurn: 1 });
     var nextPlayer = currentPlayer == 1 ? -1 : 1;
     setstate({ gameState: arr, playerTurn: nextPlayer });
-    console.log(`Next player: ${nextPlayer}`);
+
+    if (nextPlayer == 1) {
+      setturn({ turn1: "*", turn2: "" });
+    } else if (nextPlayer == -1) {
+      setturn({ turn1: "", turn2: "*" });
+    }
 
     var winner = getWinner();
     if (winner == 1) {
+      settext("Player 1 Wins");
       setmodal(true);
-      alert('Player 1 wins')
+      
     } else if (winner == -1) {
+      settext("Player 2 wins");
       setmodal(true);
-      alert('Player 2 wins')
+      
+    } else {
+      var arr = getstate.gameState;
+      if (
+        arr[0][0] !== 0 &&
+        arr[0][1] !== 0 &&
+        arr[0][2] !== 0 &&
+        arr[1][0] !== 0 &&
+        arr[1][1] !== 0 &&
+        arr[1][2] !== 0 &&
+        arr[2][0] !== 0 &&
+        arr[2][1] !== 0 &&
+        arr[2][2] !== 0
+      ) {
+        settext("DRAW");
+        setmodal(true);
+        
+      }
     }
   };
 
   return (
     <View style={styles.container}>
+      <Modal visible={getmodal}>
+        <View style={styles.container}>
+          <Text style={styles.textTitle}> {gettext}</Text>
+          <View style={styles.play}>
+
+            <Button
+              color="green"
+              style={styles.playagain}
+              onPress={playAgain}
+              title="Play Again"
+            />
+            
+          </View>
+        </View>
+      </Modal>
+
       <Text style={{ fontSize: 50, paddingBottom: 50 }}>TIC TAC TOE</Text>
 
       <View style={styles.player2}>
-        <Text style={styles.player}> {getstate.playerTurn} </Text>
+        <Text style={styles.player}> {getturn.turn2} </Text>
         <Text style={styles.player}>
           Player 2 : <Icon style={styles.iconSize} name="close" />{" "}
         </Text>
@@ -215,10 +256,14 @@ export default function App() {
         </Pressable>
       </View>
       <View style={styles.player1}>
-        <Text style={styles.player}> {getstate.playerTurn} </Text>
+        <Text style={styles.player}> {getturn.turn1} </Text>
         <Text style={styles.player}>
           Player 1 : <Icon style={styles.iconSize} name="circle-outline" />{" "}
         </Text>
+      </View>
+
+      <View style={{ paddingTop: 20 }}>
+        <Button title="NEW GAME" onPress={() => initializaGame()} />
       </View>
 
       <StatusBar style="auto" />
@@ -265,5 +310,16 @@ const styles = StyleSheet.create({
   },
   iconSize: {
     fontSize: 15,
+  },
+  textTitle: {
+    fontSize: 40,
+  },
+  playagain: {
+    borderRadius: 50,
+  },
+  play: {
+    paddingTop: 50,
+    // borderRadius: 50
+    width: '40%',
   },
 });
