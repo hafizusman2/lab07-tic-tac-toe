@@ -112,8 +112,10 @@ export default function App() {
     var winner = getWinner();
     if (winner == 1) {
       setmodal(true);
+      alert('Player 1 wins')
     } else if (winner == -1) {
       setmodal(true);
+      alert('Player 2 wins')
     }
   };
 
